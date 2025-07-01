@@ -1,0 +1,300 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions  Session[]
+  otps      OTP[]
+  backgroundScreening BackgroundScreening?
+  transactions        Transaction[] @relation("BuyerTransactions")
+  processedTransactions Transaction[] @relation("ProcessedBy")
+  contactMessages     ContactMessage[]
+  isActive  Boolean   @default(true)
+  dogApplications    DogApplication[]
+  favoriteDogs       FavoriteDog[]
+  conversations Conversation[] @relation("BuyerConversations")
+  sentMessages Message[] @relation("SentMessages")
+  dogDocuments     DogDocument[]      @relation("UploadedBy")
+  invoiceAuditLogs InvoiceAuditLog[]  @relation("AuditUser")
+  financeEntries   FinanceEntry[]     @relation("FinanceCreator")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  BUYER
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BackgroundScreening {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  experience String
+  livingConditions String
+  household  String
+  timeCommitment String
+  idDocument String
+  proofOfResidence String
+  letter     String?
+  interestedBreed String?
+  status     ScreeningStatus @default(PENDING)
+  adminNote  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  archived   Boolean  @default(false)
+}
+
+enum ScreeningStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum Size {
+  SMALL
+  MEDIUM
+  LARGE
+  UNKNOWN
+}
+
+model Dog {
+  id        Int      @id @default(autoincrement())
+  name      String
+  breed     String
+  type      String
+  birthDate DateTime?
+  temperament String
+  healthStatus String
+  images    String[] // store file paths
+  price     Float
+  costFood  Float
+  costVitamins Float
+  costVet   Float
+  costVaccine Float
+  costGrooming Float
+  costAccessories Float
+  status    DogStatus @default(AVAILABLE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
+  ageCategory AgeCategory @default(PUPPY)
+  applications    DogApplication[]
+  favoriteBy      FavoriteDog[]
+  gender    Gender @default(UNKNOWN)
+  size      Size   @default(UNKNOWN)
+  age       Int?   // in months or years, to be interpreted by frontend
+  dogDocuments DogDocument[] @relation("DogDocuments")
+}
+
+enum DogStatus {
+  AVAILABLE
+  PENDING
+  REHOMED
+  DELETED
+}
+
+enum AgeCategory {
+  PUPPY
+  YOUNG_ADULT
+  ADULT
+  SENIOR
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  buyer     User     @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  buyerId   Int
+  dog       Dog      @relation(fields: [dogId], references: [id])
+  dogId     Int
+  processedBy User   @relation("ProcessedBy", fields: [processedById], references: [id])
+  processedById Int
+  date      DateTime @default(now())
+  price     Float
+  totalCost Float
+  profit    Float
+  receipt   String
+  status    DogStatus
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  subject   String
+  message   String
+  dogName   String?
+  status    ContactStatus @default(UNREAD)
+  createdAt DateTime @default(now())
+}
+
+enum ContactStatus {
+  UNREAD
+  READ
+  REPLIED
+}
+
+model DogApplication {
+  id         Int      @id @default(autoincrement())
+  buyer      User     @relation(fields: [buyerId], references: [id])
+  buyerId    Int
+  dog        Dog      @relation(fields: [dogId], references: [id])
+  dogId      Int
+  message    String
+  status     DogApplicationStatus @default(PENDING)
+  adminNote  String?
+  withdrawNote String? // Reason provided by buyer when withdrawing
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  invoice    Invoice?
+}
+
+enum DogApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+model FavoriteDog {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  dog       Dog      @relation(fields: [dogId], references: [id])
+  dogId     Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dogId])
+}
+
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  buyer      User     @relation("BuyerConversations", fields: [buyerId], references: [id])
+  buyerId    Int      @unique // Only one conversation per buyer
+  messages   Message[]
+  archivedByBuyer   Boolean   @default(false)
+  archivedByAdmin   Boolean   @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Message {
+  id            Int      @id @default(autoincrement())
+  conversation  Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId      Int
+  content       String
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  attachments   MessageAttachment[]
+}
+
+model MessageAttachment {
+  id        Int      @id @default(autoincrement())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId Int
+  fileName  String
+  filePath  String
+  fileType  String   // pdf, jpg, png
+  fileSize  Int      // in bytes
+  createdAt DateTime @default(now())
+}
+
+model DogDocument {
+  id        Int      @id @default(autoincrement())
+  dog       Dog     @relation("DogDocuments", fields: [dogId], references: [id])
+  dogId     Int
+  fileName  String
+  filePath  String
+  fileType  String   // pdf, jpg, png, etc.
+  uploadedBy User   @relation("UploadedBy", fields: [uploadedById], references: [id])
+  uploadedById Int
+  description String?
+  createdAt  DateTime @default(now())
+}
+
+model FinanceEntry {
+  id          Int      @id @default(autoincrement())
+  type        FinanceType
+  category    String   // e.g., 'rehoming', 'store', 'donation', 'vet', 'food', 'supplies', 'staff', 'rent', etc.
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdBy   User     @relation("FinanceCreator", fields: [createdById], references: [id])
+  createdById Int
+}
+
+enum FinanceType {
+  INCOME
+  EXPENSE
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  REHOMED
+}
+
+model Invoice {
+  id            Int           @id @default(autoincrement())
+  application   DogApplication @relation(fields: [applicationId], references: [id])
+  applicationId Int           @unique
+  amount        Float
+  breakdown     Json
+  status        InvoiceStatus @default(PENDING)
+  paidAt        DateTime?
+  rehomedAt     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  auditLogs     InvoiceAuditLog[]
+}
+
+model InvoiceAuditLog {
+  id        Int      @id @default(autoincrement())
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId Int
+  user      User     @relation("AuditUser", fields: [userId], references: [id])
+  userId    Int
+  action    String
+  changes   Json?
+  createdAt DateTime @default(now())
+}
