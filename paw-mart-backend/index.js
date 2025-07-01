@@ -23,7 +23,13 @@ const app = express();
 const prisma = new PrismaClient();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://paw-mart-ft27i9a2w-jose-laurels-projects.vercel.app/", // your actual Vercel frontend URL
+    "http://localhost:3000"
+  ],
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
