@@ -36,6 +36,8 @@ interface FilterState {
   status: string;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -116,7 +118,7 @@ export default function Home() {
   useEffect(() => {
     if (user?.role === 'BUYER' && token) {
       setAppsLoading(true);
-      fetch('http://localhost:4000/api/applications/my', {
+      fetch(`${API_BASE}/api/applications/my`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))
@@ -129,7 +131,7 @@ export default function Home() {
           setAppsLoading(false);
         });
       setFavoritesLoading(true);
-      fetch('http://localhost:4000/api/favorites/my', {
+      fetch(`${API_BASE}/api/favorites/my`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))
@@ -142,7 +144,7 @@ export default function Home() {
           setFavoritesLoading(false);
         });
       // Fetch screening rejection reason if needed
-      fetch('http://localhost:4000/api/screening/my-status', {
+      fetch(`${API_BASE}/api/screening/my-status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))
@@ -155,7 +157,7 @@ export default function Home() {
   // Fetch unread messages for badge
   useEffect(() => {
     if (user?.role === 'BUYER' && token) {
-      fetch('http://localhost:4000/api/messages/unread-count', {
+      fetch(`${API_BASE}/api/messages/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))
@@ -168,7 +170,7 @@ export default function Home() {
 
   const fetchUserInfo = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/auth/me', {
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -178,7 +180,7 @@ export default function Home() {
         
         // Check if buyer is approved
         if (data.user.role === 'BUYER') {
-          fetch('http://localhost:4000/api/screening/my-status', {
+          fetch(`${API_BASE}/api/screening/my-status`, {
             headers: { Authorization: `Bearer ${token}` },
           })
             .then(res => res.ok ? res.json() : null)
@@ -203,7 +205,7 @@ export default function Home() {
         ...(filters.type && { type: filters.type }),
         ...(filters.temperament && { temperament: filters.temperament }),
       });
-      const res = await fetch(`http://localhost:4000/api/dogs?${queryParams}`);
+      const res = await fetch(`${API_BASE}/api/dogs?${queryParams}`);
       if (res.ok) {
         const data = await res.json();
         setDogs(data.dogs);
@@ -218,8 +220,8 @@ export default function Home() {
   const fetchFilterOptions = async () => {
     try {
       const [breedsRes, typesRes] = await Promise.all([
-        fetch('http://localhost:4000/api/dogs/breeds/available'),
-        fetch('http://localhost:4000/api/dogs/types/available')
+        fetch(`${API_BASE}/api/dogs/breeds/available`),
+        fetch(`${API_BASE}/api/dogs/types/available`)
       ]);
 
       if (breedsRes.ok) {
@@ -243,7 +245,7 @@ export default function Home() {
     if (user.role === 'ADMIN' || user.role === 'STAFF') {
       router.push('/dashboard');
     } else {
-      fetch('http://localhost:4000/api/screening/my-status', {
+      fetch(`${API_BASE}/api/screening/my-status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => res.ok ? res.json() : null)
@@ -312,7 +314,7 @@ export default function Home() {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/api/favorites${newState ? '' : `/${dogId}`}`, {
+      const res = await fetch(`${API_BASE}/api/favorites${newState ? '' : `/${dogId}`}`, {
         method: newState ? 'POST' : 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -474,7 +476,7 @@ export default function Home() {
                   {favorites.map((fav) => (
                     <div key={fav.id} className="flex items-center gap-2 border rounded p-2 bg-white shadow-sm">
                       <img
-                        src={fav.dog.images && fav.dog.images.length > 0 ? `http://localhost:4000/${fav.dog.images[0]}` : '/placeholder-dog.jpg'}
+                        src={fav.dog.images && fav.dog.images.length > 0 ? `${API_BASE}/${fav.dog.images[0]}` : '/placeholder-dog.jpg'}
                         alt={fav.dog.name}
                         className="w-8 h-8 object-cover rounded-md border"
                       />
@@ -844,7 +846,7 @@ export default function Home() {
                     setWithdrawError('');
                     if (withdrawTargetId) {
                       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-                      const res = await fetch(`http://localhost:4000/api/applications/${withdrawTargetId}/withdraw`, {
+                      const res = await fetch(`${API_BASE}/api/applications/${withdrawTargetId}/withdraw`, {
                         method: 'PATCH',
                         headers: {
                           'Content-Type': 'application/json',

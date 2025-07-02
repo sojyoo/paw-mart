@@ -7,7 +7,7 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const backendUrl = 'http://localhost:4000/api/applications';
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL + '/api/applications';
 
   // Prepare headers, removing 'host' to avoid issues
   const headers: Record<string, string> = {};

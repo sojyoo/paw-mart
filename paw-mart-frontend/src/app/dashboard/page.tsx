@@ -69,6 +69,8 @@ const sidebarLinks = [
   { key: 'messages', label: 'Messages', icon: <Mail className="w-5 h-5" /> },
 ];
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -205,7 +207,7 @@ export default function Dashboard() {
       router.replace('/');
       return;
     }
-    fetch('http://localhost:4000/api/auth/me', {
+    fetch(`${API_BASE}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
@@ -238,7 +240,7 @@ export default function Dashboard() {
 
   const fetchDogs = async () => {
     try {
-      const res = await fetch(`http://localhost:4000/api/dogs?status=AVAILABLE,PENDING,REHOMED`);
+      const res = await fetch(`${API_BASE}/api/dogs?status=AVAILABLE,PENDING,REHOMED`);
       if (res.ok) {
         const data = await res.json();
         setDogs(data.dogs);
@@ -362,7 +364,7 @@ export default function Dashboard() {
       addDogImages.forEach((file, idx) => {
         formData.append('images', file);
       });
-      const res = await fetch('http://localhost:4000/api/dogs', {
+      const res = await fetch(`${API_BASE}/api/dogs`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -490,7 +492,7 @@ export default function Dashboard() {
         formData.append('images', file);
       });
       
-      const res = await fetch(`http://localhost:4000/api/dogs/${editingDog.id}`, {
+      const res = await fetch(`${API_BASE}/api/dogs/${editingDog.id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -521,7 +523,7 @@ export default function Dashboard() {
     
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/dogs/${dog.id}`, {
+      const res = await fetch(`${API_BASE}/api/dogs/${dog.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -545,7 +547,7 @@ export default function Dashboard() {
     setBuyersError('');
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch('http://localhost:4000/api/users?role=BUYER&status=inactive', {
+      const res = await fetch(`${API_BASE}/api/users?role=BUYER&status=inactive`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch buyers');
@@ -576,7 +578,7 @@ export default function Dashboard() {
       setBuyersLoading(true);
       setBuyersError('');
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/users/${buyer.id}/status`, {
+      const res = await fetch(`${API_BASE}/api/users/${buyer.id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -598,7 +600,7 @@ export default function Dashboard() {
       setBuyersLoading(true);
       setBuyersError('');
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/users/${buyer.id}`, {
+      const res = await fetch(`${API_BASE}/api/users/${buyer.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -615,7 +617,7 @@ export default function Dashboard() {
     setScreeningsError('');
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-              let url = `http://localhost:4000/api/screening/all?limit=50`;
+              let url = `${API_BASE}/api/screening/all?limit=50`;
         if (screeningStatusFilter !== 'ALL') url += `&status=${screeningStatusFilter}`;
         const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -633,7 +635,7 @@ export default function Dashboard() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/screening/${id}/status`, {
+      const res = await fetch(`${API_BASE}/api/screening/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: 'APPROVED' }),
@@ -653,7 +655,7 @@ export default function Dashboard() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/screening/${id}/status`, {
+      const res = await fetch(`${API_BASE}/api/screening/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: 'REJECTED', adminNote: reason }),
@@ -679,12 +681,12 @@ export default function Dashboard() {
   useEffect(() => {
     if (activePage === 'applications') {
       // Fetch all dogs
-      fetch('http://localhost:4000/api/dogs?status=AVAILABLE,PENDING,REHOMED')
+      fetch(`${API_BASE}/api/dogs?status=AVAILABLE,PENDING,REHOMED`)
         .then(res => res.ok ? res.json() : null)
         .then(data => setAllDogs(data?.dogs || []));
       // Fetch all buyers
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      fetch('http://localhost:4000/api/users?role=BUYER', {
+      fetch(`${API_BASE}/api/users?role=BUYER`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => res.ok ? res.json() : null)
@@ -696,7 +698,7 @@ export default function Dashboard() {
     setApplicationsLoading(true);
     setApplicationsError('');
     try {
-      let url = 'http://localhost:4000/api/applications';
+      let url = `${API_BASE}/api/applications`;
       const params = [];
       if (applicationsStatusFilter !== 'ALL') params.push(`status=${applicationsStatusFilter}`);
       if (applicationDogFilter) params.push(`dogId=${applicationDogFilter}`);
@@ -728,7 +730,7 @@ export default function Dashboard() {
     setAppActionId(id);
     try {
       const token = localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token');
-      const res = await fetch(`http://localhost:4000/api/applications/${id}/status`, {
+      const res = await fetch(`${API_BASE}/api/applications/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -761,7 +763,7 @@ export default function Dashboard() {
         amount: parseFloat(item.amount)
       }));
 
-      const res = await fetch(`http://localhost:4000/api/invoices/generate/${invoiceTargetId}`, {
+      const res = await fetch(`${API_BASE}/api/invoices/generate/${invoiceTargetId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -817,7 +819,7 @@ export default function Dashboard() {
     if (activePage === 'overview') {
       setAnalyticsLoading(true);
       setAnalyticsError('');
-      fetch(`http://localhost:4000/api/dashboard/overview?period=${analyticsPeriod}`)
+      fetch(`${API_BASE}/api/dashboard/overview?period=${analyticsPeriod}`)
         .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch analytics'))
         .then(data => setAnalytics(data))
         .catch(err => setAnalyticsError(err.toString()))
@@ -832,7 +834,7 @@ export default function Dashboard() {
           ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token')
           : null;
       if (!token) return;
-      fetch('http://localhost:4000/api/messages/unread-count', {
+      fetch(`${API_BASE}/api/messages/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => (res.ok ? res.json() : null))
@@ -854,7 +856,7 @@ export default function Dashboard() {
     setInvoiceError('');
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-      let url = 'http://localhost:4000/api/invoices?';
+      let url = `${API_BASE}/api/invoices?`;
       if (invoiceStatusFilter !== 'ALL') url += `status=${invoiceStatusFilter}&`;
       if (invoiceSearch) url += `search=${encodeURIComponent(invoiceSearch)}&`;
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
@@ -887,7 +889,7 @@ export default function Dashboard() {
     // Fetch audit log
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-      const res = await fetch(`http://localhost:4000/api/invoices/${invoice.id}/audit-log`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}/api/invoices/${invoice.id}/audit-log`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error('Failed to load audit log');
       const data = await res.json();
       setAuditLogs(data.logs || []);
@@ -897,7 +899,7 @@ export default function Dashboard() {
   };
   const handleDownloadPDF = async (invoice: Invoice) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-    const res = await fetch(`http://localhost:4000/api/invoices/${invoice.id}/pdf`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${API_BASE}/api/invoices/${invoice.id}/pdf`, { headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) {
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -911,18 +913,18 @@ export default function Dashboard() {
   const handleDeleteInvoice = async (invoice: Invoice) => {
     if (!window.confirm('Are you sure you want to delete this invoice?')) return;
     const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-    const res = await fetch(`http://localhost:4000/api/invoices/${invoice.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${API_BASE}/api/invoices/${invoice.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) fetchInvoices();
   };
   const handleMarkPaid = async (invoice: Invoice) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-    const res = await fetch(`http://localhost:4000/api/invoices/${invoice.id}/mark-paid`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${API_BASE}/api/invoices/${invoice.id}/mark-paid`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) fetchInvoices();
   };
   const handleMarkPending = async (invoice: Invoice) => {
     // Use edit endpoint to revert to pending
     const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-    const res = await fetch(`http://localhost:4000/api/invoices/${invoice.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: 'PENDING' }) });
+    const res = await fetch(`${API_BASE}/api/invoices/${invoice.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: 'PENDING' }) });
     if (res.ok) fetchInvoices();
   };
 
@@ -943,7 +945,7 @@ export default function Dashboard() {
     const breakdown = editBreakdown.filter(b => b.description && b.amount > 0);
     const amount = breakdown.reduce((sum, b) => sum + Number(b.amount), 0);
     const token = typeof window !== 'undefined' ? localStorage.getItem('pawmart_token') || sessionStorage.getItem('pawmart_token') : null;
-    const res = await fetch(`http://localhost:4000/api/invoices/${selectedInvoice?.id}`, {
+    const res = await fetch(`${API_BASE}/api/invoices/${selectedInvoice?.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ amount, breakdown }),
@@ -1357,10 +1359,10 @@ export default function Dashboard() {
                           <td className="py-2 px-4 max-w-xs whitespace-pre-line">{s.household}</td>
                           <td className="py-2 px-4 max-w-xs whitespace-pre-line">{s.timeCommitment}</td>
                           <td className="py-2 px-4">
-                            <a href={`http://localhost:4000/${s.idDocument}`} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">View</a>
+                            <a href={`${API_BASE}/${s.idDocument}`} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">View</a>
                           </td>
                           <td className="py-2 px-4">
-                            <a href={`http://localhost:4000/${s.proofOfResidence}`} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">View</a>
+                            <a href={`${API_BASE}/${s.proofOfResidence}`} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">View</a>
                           </td>
                           <td className="py-2 px-4 max-w-xs whitespace-pre-line">{s.letter}</td>
                           <td className="py-2 px-4">{s.interestedBreed || <span className="text-gray-400 italic">N/A</span>}</td>
@@ -1873,7 +1875,7 @@ export default function Dashboard() {
                       selectedDog.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`http://localhost:4000/${image}`}
+                          src={`${API_BASE}/${image}`}
                           alt={`${selectedDog.name} - Image ${index + 1}`}
                           className="w-full h-48 object-cover rounded-lg border"
                           onError={(e) => {

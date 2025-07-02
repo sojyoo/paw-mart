@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-const API_BASE = 'http://localhost:4000/api/auth';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL + '/api/auth';
 
 interface UserInfo {
   email: string;
@@ -33,7 +33,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
 
   const fetchUserInfo = async (token: string): Promise<UserInfo | null> => {
     try {
-      const res = await fetch('http://localhost:4000/api/auth/me', {
+      const res = await fetch(API_BASE + '/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return null;
@@ -52,7 +52,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
     try {
       if (forgotMode) {
         // Forgot password request
-        const res = await fetch(`${API_BASE}/forgot-password`, {
+        const res = await fetch(API_BASE + '/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
@@ -64,7 +64,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
         setResetMode(true);
       } else if (resetMode) {
         // Reset password request
-        const res = await fetch(`${API_BASE}/reset-password`, {
+        const res = await fetch(API_BASE + '/reset-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, newPassword: password, otp }),
@@ -77,7 +77,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
         setIsLogin(true);
       } else if (showOtp) {
         // OTP verification
-        const res = await fetch(`${API_BASE}/verify-otp`, {
+        const res = await fetch(API_BASE + '/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, otp }),
@@ -108,7 +108,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
           body = isLogin ? { email, password } : { email, password, name };
         }
         
-        const res = await fetch(`${API_BASE}${endpoint}`, {
+        const res = await fetch(API_BASE + endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -119,7 +119,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLoginSuccess }) => {
         // If admin login and skip OTP is enabled, directly create a mock token and login
         if (isAdminLogin && skipOtpForAdmin) {
           // Use the development endpoint for admin login without OTP
-          const devRes = await fetch(`${API_BASE}/admin-login-dev`, {
+          const devRes = await fetch(API_BASE + '/admin-login-dev', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
