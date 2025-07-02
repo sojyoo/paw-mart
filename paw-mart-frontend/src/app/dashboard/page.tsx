@@ -69,7 +69,7 @@ const sidebarLinks = [
   { key: 'messages', label: 'Messages', icon: <Mail className="w-5 h-5" /> },
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = 'http://localhost:4000';
 
 export default function Dashboard() {
   const router = useRouter();

@@ -9,7 +9,7 @@ const EXPERIENCE_OPTIONS = [
   "Professional/Trainer"
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = 'http://localhost:4000';
 
 export default function ScreeningFormPage() {
   const router = useRouter();
