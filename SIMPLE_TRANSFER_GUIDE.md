@@ -1,8 +1,8 @@
-# Simple PawMart Transfer Guide (ZIP Method)
+# PawMart Transfer Guide
 
-This is the easiest way to transfer your PawMart project to another PC!
+This is the easiest way to transfer to another PC
 
-## 📦 Step 1: Create the ZIP File
+## Step 1: Create the ZIP File
 
 ### On Your Current PC:
 1. **Export your database first:**
@@ -30,8 +30,6 @@ This is the easiest way to transfer your PawMart project to another PC!
 ### Transfer Methods:
 - **USB Drive:** Copy the ZIP file to a USB drive
 - **Cloud Storage:** Upload to Google Drive, Dropbox, or OneDrive
-- **Email:** If the file is small enough (under 25MB)
-- **Direct Transfer:** Use a cable or network transfer
 
 ## 📥 Step 3: Setup on Target PC
 
@@ -150,5 +148,3 @@ npm run dev
 - [ ] Test user login/registration
 - [ ] Test dog browsing
 - [ ] Test admin features
-
-This ZIP method is much simpler and should work perfectly for your presentation! 🐕✨ 
