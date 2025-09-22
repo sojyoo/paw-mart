@@ -3,3 +3,7 @@ node_modules
 .env
 
 /generated/prisma
+ 
+# Local uploads and large files (optional to ignore)
+uploads/
+pawmart_backup.sql

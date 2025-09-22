@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function resetPassword() {
   try {
-    const email = 'laurel.j.bscs@gmail.com'; // The email to reset
+    const email = process.env.ADMIN_EMAIL; // The email to reset
     const newPassword = 'admin123'; // The new password
 
     const user = await prisma.user.findUnique({ where: { email } });

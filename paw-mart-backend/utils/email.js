@@ -11,8 +11,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Helper to get the sender email
-const SENDER_EMAIL = process.env.FROM_EMAIL || 'laurel.j.bscs@gmail.com';
+// Helper to get the sender email (no personal fallback)
+const SENDER_EMAIL = process.env.FROM_EMAIL || 'noreply@example.com';
 
 // Send OTP email
 async function sendOTPEmail(to, otp, type = 'verification') {

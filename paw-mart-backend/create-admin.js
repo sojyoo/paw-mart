@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 async function createAdmin() {
   try {
-    // Change this to your actual email address
-    const adminEmail = 'laurel.j.bscs@gmail.com'; // REPLACE WITH YOUR EMAIL
-    const adminPassword = 'admin123';
-    const adminName = 'PawMart Admin';
+    // Read admin defaults from environment variables
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminName = process.env.ADMIN_NAME || 'PawMart Admin';
 
     // Check if admin already exists
     const existingAdmin = await prisma.user.findUnique({

@@ -81,14 +81,15 @@ DATABASE_URL="postgresql://username:password@localhost:5432/pawmart"
 # JWT Configuration
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 
-# Email Configuration (SendGrid)
-SENDGRID_API_KEY="your-sendgrid-api-key"
+# Email Configuration
 FROM_EMAIL="noreply@pawmart.com"
 ADMIN_EMAIL="admin@pawmart.com"
 
-# Alternative Email Configuration (Gmail)
-EMAIL_USER="your-email@gmail.com"
-EMAIL_PASS="your-app-password"
+# SMTP Configuration (recommended)
+SMTP_HOST="smtp.yourprovider.com"
+SMTP_PORT=587
+SMTP_USER="smtp-username"
+SMTP_PASS="smtp-password"
 
 # Server Configuration
 PORT=4000

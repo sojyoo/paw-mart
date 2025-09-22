@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function makeAdmin() {
   try {
-    const email = 'laurel.j.bscs@gmail.com'; // The email to promote
+    const email = process.env.ADMIN_EMAIL; // The email to promote
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
