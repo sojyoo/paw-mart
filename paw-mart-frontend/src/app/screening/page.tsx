@@ -9,8 +9,6 @@ const EXPERIENCE_OPTIONS = [
   "Professional/Trainer"
 ];
 
-const API_BASE = 'http://localhost:4000';
-
 export default function ScreeningFormPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"NOT_SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED">("NOT_SUBMITTED");
@@ -39,14 +37,14 @@ export default function ScreeningFormPage() {
       router.replace("/");
       return;
     }
-    fetch(`${API_BASE}/api/auth/me`, {
+    fetch("http://localhost:4000/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && data.user && data.user.role === "BUYER") {
           setUser({ name: data.user.name, email: data.user.email, role: data.user.role });
-          fetch(`${API_BASE}/api/screening/my-status`, {
+          fetch("http://localhost:4000/api/screening/my-status", {
             headers: { Authorization: `Bearer ${token}` },
           })
             .then((res) => (res.ok ? res.json() : null))
@@ -123,7 +121,7 @@ export default function ScreeningFormPage() {
     try {
       // Only use /update if status is REJECTED
       const shouldUpdate = status === "REJECTED";
-      const endpoint = shouldUpdate ? `${API_BASE}/api/screening/update` : `${API_BASE}/api/screening/submit`;
+      const endpoint = shouldUpdate ? "http://localhost:4000/api/screening/update" : "http://localhost:4000/api/screening/submit";
       const method = shouldUpdate ? "PUT" : "POST";
       const res = await fetch(endpoint, {
         method,
@@ -199,13 +197,13 @@ export default function ScreeningFormPage() {
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold"
             onClick={async () => {
               const token = localStorage.getItem("pawmart_token") || sessionStorage.getItem("pawmart_token");
-              const res = await fetch(`${API_BASE}/api/screening/reapply`, {
+              const res = await fetch("http://localhost:4000/api/screening/reapply", {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
               });
               if (res.ok) {
                 // Refetch status from backend to ensure state is correct
-                const statusRes = await fetch(`${API_BASE}/api/screening/my-status`, {
+                const statusRes = await fetch("http://localhost:4000/api/screening/my-status", {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 const statusData = statusRes.ok ? await statusRes.json() : null;
